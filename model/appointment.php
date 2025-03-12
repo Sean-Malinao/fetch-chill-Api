@@ -23,13 +23,13 @@ class Appointment{
         $stmt->close();
         return $appointment;
     }
-    // get all appointments
+    // fetch all appointments
     public function GetAllAppointments(){
         $query = "SELECT * FROM appointments";
         $result = $this->conn->query($query);
         return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC): [];
     }
-    //Creating request appointments
+    //Creating new appointments
     public function CreateAppointments($user_id, $service_type, $appointment_date, $appointment_time){ 
         $query = "INSERT INTO appointments (user_id, service_type, appointment_date, appointment_time) VALUES (?, ?, ?,?)";
         if($stmt = $this->conn->prepare($query)){
@@ -42,6 +42,7 @@ class Appointment{
             $stmt->close();
         }
     }
+    //update appointment status
     public function UpdateStatus($status, $id) {
         $stmt = $this->conn->prepare("UPDATE appointments SET status = ? WHERE id = ?");
         if ($stmt === false) {

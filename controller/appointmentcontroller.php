@@ -22,7 +22,7 @@ class AppointmentController {
         if($appointments){
             echo json_encode($appointments);
         } else{
-        echo json_encode(['message' => $appointments]);
+        echo json_encode(['message' => 'No appointment found'. $appointments]);
         } 
     }
 

@@ -43,6 +43,7 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
             echo json_encode(['message' => 'Invalid request method']);
     }
     
+    
 }
 if (preg_match('/\/appointment/', $uri)) {
     handleappointments($appointmentController, $requestMethod, $uri, $input);
