@@ -54,5 +54,7 @@ class Appointment{
         }
         $stmt->close();
     }
+
+
 }
 ?>

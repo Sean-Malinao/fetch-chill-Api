@@ -1,31 +1,52 @@
 <?php
-include '../config/pet_connection.php';
-include '../model/petrecords.php';
+require_once '../model/petrecords.php';
 
-class PetRecordController {
-    public $model;
+class PetController {
+    private $model;
 
-    public function __construct($conn) {
-        $this->model = new PetRecordModel($conn);
+    public function __construct() {
+        $this->model = new PetModel();
     }
 
-    public function handleRequest() {
-        $request_uri = explode("/", $_SERVER['REQUEST_URI']);
-        $id = end($request_uri);
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $result = $this->model->insertPetRecord($input);
-            echo json_encode(["message" => $result ? "Pet record added successfully!" : "Error"]);
-        } elseif ($_SERVER["REQUEST_METHOD"] == "PUT" && is_numeric($id)) {
-            $result = $this->model->updatePetRecord($id, $input);
-            echo json_encode(["message" => $result ? "Record updated successfully!" : "Error"]);
-        } elseif ($_SERVER["REQUEST_METHOD"] == "DELETE" && is_numeric($id)) {
-            $result = $this->model->deletePetRecord($id);
-            echo json_encode(["message" => $result ? "Record deleted successfully!" : "Record does not exist"]);
+    public function createPet($data) {
+        if ($this->model->insertPet($data)) {
+            echo json_encode(["message" => "Pet record added successfully!"]);
         } else {
-            $records = $this->model->getAllPetRecords();
+            echo json_encode(["message" => "Error"]);
+        }
+    }
+
+    public function updatePet($id, $data) {
+        if ($this->model->updatePet($id, $data)) {
+            echo json_encode(["message" => "Record updated successfully!", "result" => $data]);
+        } else {
+            echo json_encode(["message" => "Error"]);
+        }
+    }
+
+    public function deletePet($id) {
+        if ($this->model->deletePet($id)) {
+            echo json_encode(["message" => "Record deleted successfully!"]);
+        } else {
+            echo json_encode(["message" => "Record not found."]);
+        }
+    }
+
+    public function searchPetByOwner($ownername) {
+        $records = $this->model->searchPetByOwner($ownername);
+        if (!empty($records)) {
             echo json_encode($records);
+        } else {
+            echo json_encode(["message" => "No records found."]);
+        }
+    }
+
+    public function getAllPets() {
+        $records = $this->model->getAllPets();
+        if (!empty($records)) {
+            echo json_encode($records);
+        } else {
+            echo json_encode(["message" => "No records found."]);
         }
     }
 }
