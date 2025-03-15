@@ -15,10 +15,11 @@ if (strpos($contentType, 'application/json') === false) {
 $input = json_decode(file_get_contents('php://input'), true);
 $appointmentController = new AppointmentController();
 $petrecordsController = new PetController();
+
 //handle appointments
 function handleappointments($appointmentController, $requestMethod, $uri, $input) {
     switch ($requestMethod) {
-        case 'GET':
+        case 'GET': // Handle GET requests for appointments
             if (preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
                 $appointmentController->GetAppointment($matches[1]);
             } elseif (preg_match('/\/appointment/', $uri)) {
@@ -27,14 +28,14 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                 echo json_encode(['message' => 'No appointment found']);
             }
             break;
-        case 'POST':
+        case 'POST': // Handle POST requests to create a new appointment
             if(preg_match('/\/appointment/', $uri)){
                 $appointmentController->CreateAppointment($input);
             } else {
                 echo json_encode(['message' => 'Invalid endpoint']);
             }
             break;
-        case 'PATCH':
+        case 'PATCH': // Handle PATCH requests to update an appointment's status
             if (preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
                 $appointmentController->UpdateAppointmentsStatus($matches[1], $input);
             } else {
@@ -48,28 +49,28 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
     //handle petrecords
     function handlepetrecords($petrecordsController, $requestMethod, $uri, $input) {
         switch ($requestMethod) {
-            case "POST":
+            case "POST": // Handle POST requests to create a new pet record
                 if (preg_match('/\/petrecords/', $uri)) {
                     $petrecordsController->createPet($input);
                 } else {
                     echo json_encode(['message' => 'Invalid endpoint']);
                 }
                 break;
-            case "PUT":
+            case "PUT":  // Handle PUT requests to update an existing pet record
                 if (preg_match('/\/petrecords\/(\d+)/', $uri, $matches)) {
                     $petrecordsController->updatePet($matches[1], $input);
                 } else {
                     echo json_encode(['message' => 'Invalid endpoint']);
                 }
                 break;
-            case "DELETE":
+            case "DELETE":   // Handle DELETE requests to delete a pet record
                 if (preg_match('/\/petrecords\/(\d+)/', $uri, $matches)) {
                     $petrecordsController->deletePet($matches[1]);
                 } else {
                     echo json_encode(['message' => 'Invalid endpoint']);
                 }
                 break;
-            case "GET":
+            case "GET": //for searching pet by owner name
                 if (isset($_GET['ownername'])) {
                     $petrecordsController->searchPetByOwner($_GET['ownername']);
                 } elseif (preg_match('/\/petrecords\/(\d+)/', $uri, $matches)) {
@@ -84,7 +85,7 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
             }
         }
 
-
+// Determine which endpoint is being accessed and call the appropriate handler function
 if (preg_match('/\/appointment/', $uri)) {
     handleappointments($appointmentController, $requestMethod, $uri, $input);
 } elseif (preg_match('/\/petrecords/', $uri)) {

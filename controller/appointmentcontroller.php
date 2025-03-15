@@ -7,7 +7,7 @@ class AppointmentController {
     {
         $this->appointment = new Appointment();
     }
-
+    // Get appointment by id
     public function GetAppointment($id){
         $appointment = $this->appointment->GetAppointment($id);
         if($appointment){
@@ -16,7 +16,7 @@ class AppointmentController {
             echo json_encode(['message' => 'No appointment found']);
         }
     }
-
+    // Get all appointments
     public function GetAllAppointments(){
         $appointments = $this->appointment->GetAllAppointments();
         if($appointments){
@@ -25,7 +25,7 @@ class AppointmentController {
         echo json_encode(['message' => 'No appointment found'. $appointments]);
         } 
     }
-
+    //Create appointment
     public function CreateAppointment($input){
         $user_id = $input['user_id'];
         $service_type = $input['service_type'];
@@ -33,7 +33,7 @@ class AppointmentController {
         $appointment_time = $input['appointment_time'];
         $this->appointment->CreateAppointments($user_id, $service_type, $appointment_date, $appointment_time);
     }
-
+    //Update appointment status
     public function UpdateAppointmentsStatus($id, $input){
         $appointment = $this->appointment->GetAppointment($id);
         if(!$appointment){
