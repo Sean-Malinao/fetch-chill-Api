@@ -37,16 +37,16 @@ class UserController{
     }
 
     //change pass
-    public function changepassword($email, $oldpassword, $newpassword, $confirmpassword){
-        $user = $this->userModel->getUserByEmail($email);
+    public function changepassword($id, $oldpassword, $newpassword, $confirmpassword){
+        $user = $this->userModel->getUserByid($id);
         if(!$user){
             echo json_encode(['message' => 'User not found']);
             return;
         }
         if(password_verify($oldpassword, $user['password'])){
-            if($newpassword !== $confirmpassword){
+            if($newpassword === $confirmpassword){
                 $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
-                $this->userModel->Updateuserpassword($email, $hashed_password);
+                $this->userModel->Updateuserpassword($id, $hashed_password);
                 echo json_encode(['message' => 'Password change successfully']);
             } else{
                 echo json_encode(['message' => 'New password and confirm password do not match']);
