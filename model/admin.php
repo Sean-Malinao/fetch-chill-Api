@@ -18,6 +18,20 @@ class AdminModel{
         $stmt->close();
         return $result;
     } 
+        //check if email exists
+    public function getByEmail($email) {
+        $sql = "SELECT * FROM admin WHERE email = ?";
+        if ($stmt = $this->conn->prepare($sql)) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $admin = $result->fetch_assoc();
+            $stmt->close();
+            return $admin === null ? null : $admin;
+        } else {
+            return "Error: " . $this->conn->error;
+        }
+       }
 
     //login staff/admin
     public function loginStaff($email, $password) {
@@ -57,20 +71,5 @@ class AdminModel{
         $result = $this->conn->query($query);
         return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
-
-    //check if email exists
-    public function getByEmail($email) {
-        $sql = "SELECT * FROM admin WHERE email = ?";
-        if ($stmt = $this->conn->prepare($sql)) {
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $admin = $result->fetch_assoc();
-            $stmt->close();
-            return $admin === null ? null : $admin;
-        } else {
-            return "Error: " . $this->conn->error;
-        }
-       }
 }
 ?>

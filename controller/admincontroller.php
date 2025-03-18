@@ -8,6 +8,7 @@ class AdminController {
     {
         $this->adminModel = new AdminModel();
     }
+
     // creating staff
     public function createStaff($input) {
         $name = $input['name'];
@@ -22,6 +23,7 @@ class AdminController {
         $this->adminModel->createStaff($name, $email, $password, $role);
         echo json_encode(['message' => 'Staff created', 'staff' => $input]);
     }
+    
     //login staff/admin
     public function loginStaff($input) {
         $email = $input['email'];
@@ -48,5 +50,7 @@ class AdminController {
         $this->adminModel->deleteStaff($id);
         echo json_encode(['message' => 'Staff deleted']);
     }
+
+    
 }
 ?>

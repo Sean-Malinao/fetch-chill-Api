@@ -1,5 +1,6 @@
 <?php
 require_once '../model/appointment.php';
+
 class AppointmentController {
     private $appointment;
 
@@ -10,6 +11,15 @@ class AppointmentController {
     // Get appointment by id
     public function GetAppointment($id){
         $appointment = $this->appointment->GetAppointment($id);
+        if($appointment){
+            echo json_encode($appointment);
+        } else{
+            echo json_encode(['message' => 'No appointment found']);
+        }
+    }
+    //get all appointments by user id
+    public function GetallAppointmentsByUserId($user_id){
+        $appointment = $this->appointment->GetAppointmentByUserId($user_id);
         if($appointment){
             echo json_encode($appointment);
         } else{
@@ -43,6 +53,16 @@ class AppointmentController {
         $status = $input['status'];
         $this->appointment->UpdateStatus($status, $id);
         echo json_encode(['message' => 'Appointment status updated']);
+    }
+    //Delete appointment
+    public function DeleteAppointment($id){
+        $appointment = $this->appointment->GetAppointment($id);
+        if(!$appointment){
+            echo json_encode(['message' => 'No appointment found']);
+            return;
+        }
+        $this->appointment->DeleteAppointment($id);
+        echo json_encode(['message' => 'Appointment deleted']);
     }
 
 }

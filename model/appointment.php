@@ -23,6 +23,21 @@ class Appointment{
         $stmt->close();
         return $appointment;
     }
+    //get all appointments of a user
+    public function GetAppointmentByUserId($user_id) {
+        $stmt = $this->conn->prepare("SELECT * FROM appointments WHERE user_id = ?");
+        if ($stmt === false) {
+            throw new mysqli_sql_exception("Prepare statement failed: " . $this->conn->error);
+        }
+        $stmt->bind_param('i', $user_id);
+        if ($stmt->execute() === false) {
+            throw new mysqli_sql_exception("Execute statement failed: " . $stmt->error);
+        }
+        $result = $stmt->get_result();
+        $appointment = $result->fetch_assoc();
+        $stmt->close();
+        return $appointment;
+    }
     // fetch all appointments
     public function GetAllAppointments(){
         $query = "SELECT * FROM appointments";
@@ -54,7 +69,17 @@ class Appointment{
         }
         $stmt->close();
     }
-
-
+    //delete appointment
+    public function DeleteAppointment($id){
+        $stmt = $this->conn->prepare("DELETE FROM appointments WHERE id = ?");
+        if ($stmt === false) {
+            throw new mysqli_sql_exception("Prepare statement failed: " . $this->conn->error);
+        }
+        $stmt->bind_param('i', $id);
+        if ($stmt->execute() === false) {
+            throw new mysqli_sql_exception("Execute statement failed: " . $stmt->error);
+        }
+        $stmt->close();
+    }
 }
 ?>

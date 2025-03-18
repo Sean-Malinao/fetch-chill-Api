@@ -1,28 +1,35 @@
 <?php
 header("Content-Type: application/json");
 
+//controllers
 require_once '../controller/appointmentcontroller.php';
 require_once '../controller/petrecordscontroller.php';
 require_once '../controller/admincontroller.php';
+require_once '../controller/usercontroller.php';
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $uri = $_SERVER['REQUEST_URI'];
 $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
+
 if (strpos($contentType, 'application/json') === false) {
     echo json_encode(['message' => 'Invalid json content type.']);
     exit;
 }
+
 $input = json_decode(file_get_contents('php://input'), true);
 $appointmentController = new AppointmentController();
 $petrecordsController = new PetController();
 $adminController = new AdminController();
+$usercontroller = new UserController();
 
 //handle appointments
 function handleappointments($appointmentController, $requestMethod, $uri, $input) {
     switch ($requestMethod) {
-        case 'GET': // Handle GET requests for appointments
-            if (preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
+        case 'GET': 
+            if(preg_match('/\/appointment\/user\/(\d+)/', $uri, $matches)) {
+                $appointmentController->GetallAppointmentsByUserId($matches[1]);
+            } elseif(preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
                 $appointmentController->GetAppointment($matches[1]);
             } elseif (preg_match('/\/appointment/', $uri)) {
                 $appointmentController->GetAllAppointments();
@@ -44,8 +51,16 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                 echo json_encode(['message' => 'Invalid endpoint']);
             }
             break;
+        case 'DELETE': // Handle DELETE requests to delete an appointment
+            if (preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
+                $appointmentController->DeleteAppointment($matches[1]);
+            } else {
+                echo json_encode(['message' => 'Invalid endpoint']);
+            }
+            break;
             default:
             echo json_encode(['message' => 'Invalid request method']);
+            
     }
 }
     //handle petrecords
@@ -82,10 +97,9 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                 }
                 break;
                 default:
-                echo json_encode(["message" => "Invalid request method"]);
-                break;
             }
         }
+    //for usermanagement
     function handlestaff($adminController, $requestMethod, $uri, $input) {
         switch ($requestMethod) {
             case "POST": // Handle POST requests to create a new staff
@@ -114,6 +128,44 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                 default:
         }
     }
+    // for user acc signup and login
+    function handleuser($usercontroller, $requestMethod, $uri, $input){
+        switch($requestMethod){
+            case "POST":
+                if(preg_match('/\/user\/login/', $uri)){
+                    $usercontroller->loginUser($input);
+                }elseif(preg_match('/\/user/', $uri)){
+                    $usercontroller->createUser($input);
+                }else{
+                    echo json_encode(['message' => 'Invalid endpoint']);
+                }
+                break;
+            case "GET":
+                if(preg_match('/\/user/', $uri)){
+                    $usercontroller->getAllUsers();
+                }else{
+                    echo json_encode(['message' => 'Invalid endpoint']);
+                }
+                break;
+            case "PATCH":
+                if(preg_match('/\/user\/(\d+)/', $uri, $matches)){
+                $id = $matches[1];
+                if(!empty($input)){
+                    //check if variables are present
+                    if(isset($input['old_password']) && isset($input['new_password']) && isset($input['confirm_password'])){
+                        $oldpassword = $input['old_password'];
+                        $newpassword = $input['new_password'];
+                        $confirmpassword = $input['confirm_password'];
+                        $usercontroller->changepassword($id, $oldpassword, $newpassword, $confirmpassword);
+                    }else{
+                        echo json_encode(['message' => 'Invalid input']);
+                    }
+                }else{
+                    echo json_encode(['message' => 'Invalid input']);
+                }
+        }
+    }
+}
 // Determine which endpoint is being accessed and call the appropriate handler function
 if (preg_match('/\/appointment/', $uri)) {
     handleappointments($appointmentController, $requestMethod, $uri, $input);
@@ -121,7 +173,9 @@ if (preg_match('/\/appointment/', $uri)) {
     handlepetrecords($petrecordsController, $requestMethod, $uri, $input);
 } elseif (preg_match('/\/staff/', $uri)) {
     handlestaff($adminController, $requestMethod, $uri, $input);
-}else {
+} elseif(preg_match('/\/user/', $uri)){
+    handleuser($usercontroller, $requestMethod, $uri, $input);
+} else {
     echo json_encode(['message' => 'Invalid endpoint']);
 }
 ?>
