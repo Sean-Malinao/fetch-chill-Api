@@ -53,12 +53,12 @@ class AdminController {
 
     
     public function changepassword($id, $oldpassword, $newpassword, $confirmpassword){
-        $user = $this->adminModel->getAdminByid($id);
-        if(!$user){
+        $admin = $this->adminModel->getAdminByid($id);
+        if(!$admin){
             echo json_encode(['message' => 'User not found']);
             return;
         }
-        if(password_verify($oldpassword, $user['password'])){
+        if(password_verify($oldpassword, $admin['password'])){
             if($newpassword === $confirmpassword){
                 $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
                 $this->adminModel->Updateadminpassword($id, $hashed_password);
