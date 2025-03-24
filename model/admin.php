@@ -71,5 +71,32 @@ class AdminModel{
         $result = $this->conn->query($query);
         return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
+
+     //for updating password
+     public function getAdminByid($id) {
+        $query = "SELECT * FROM admin WHERE id = ?";
+        if ($stmt = $this->conn->prepare($query)) {
+            $stmt->bind_param("s", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $stmt->close();
+            return $user;
+        } else {
+            return "Error: " . $this->conn->error;
+        }
+    }
+    //for changing password
+    public function Updateadminpassword($id, $newpassword){
+        $query = "UPDATE admin SET password = ? WHERE id = ?";
+        if($stmt = $this->conn->prepare($query)){
+            $stmt->bind_param("ss", $newpassword, $id);
+            $stmt->execute();
+            $stmt->close();
+            return true;
+        } else {
+            return "Error: " . $this->conn->error;
+        }
+    }
 }
 ?>

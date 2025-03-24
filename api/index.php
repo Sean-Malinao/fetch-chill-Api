@@ -1,5 +1,9 @@
 <?php
+
+//view
 header("Content-Type: application/json");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 
 //controllers
 require_once '../controller/appointmentcontroller.php';
@@ -125,6 +129,23 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                     echo json_encode(['message' => 'Invalid endpoint']);
                 }
                 break;
+            case "PATCH":
+                if(preg_match('/\/staff\/(\d+)/', $uri, $matches)){
+                $id = $matches[1];
+                if(!empty($input)){
+                    //check if variables are present
+                    if(isset($input['old_password']) && isset($input['new_password']) && isset($input['confirm_password'])){
+                        $oldpassword = $input['old_password'];
+                        $newpassword = $input['new_password'];
+                        $confirmpassword = $input['confirm_password'];
+                        $adminController->changepassword($id, $oldpassword, $newpassword, $confirmpassword);
+                    }else{
+                        echo json_encode(['message' => 'Invalid input']);
+                    }
+                }else{
+                    echo json_encode(['message' => 'Invalid input']);
+                }
+            }
                 default:
         }
     }

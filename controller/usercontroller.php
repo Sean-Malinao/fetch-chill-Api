@@ -29,12 +29,17 @@ class UserController{
         $email = $input['email'];
         $password = $input['password'];
         $user = $this->userModel->loginuser($email, $password);
-        if ($user) {
-            echo json_encode(['message' => 'Login successful']);
-        } else {
-            echo json_encode(['message' => 'Invalid email or password']);
-        }
+        if(password_verify($password, $user['passwoord'])){
+            $token = JwtHelper::encode(array(
+                'id' => $user['id'],
+                'email' => $user['email']
+            ));
+            echo json_encode(['message' => 'Login successful', 'token' => $token]);
+        } else{
+            echo json_encode(['message' => 'Email or password is incorrect']);
+        }   
     }
+    
 
     //change pass
     public function changepassword($id, $oldpassword, $newpassword, $confirmpassword){
@@ -54,6 +59,10 @@ class UserController{
         } else{
             echo json_encode(['message' => 'Invalid password']);
         }
+    }
+
+    public function logoutUser(){
+        echo json_encode(['message' => 'Logout successful']);
     }
 }
 ?>
