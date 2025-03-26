@@ -38,12 +38,23 @@ class Appointment{
         $stmt->close();
         return $appointment;
     }
-    // fetch all appointments
-    public function GetAllAppointments(){
-        $query = "SELECT * FROM appointments";
-        $result = $this->conn->query($query);
-        return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC): [];
+    public function GetAllConfirmedAppointments($user_id){
+        $query = "SELECT * FROM appointments WHERE user_id = ? AND status = ?";
+        $stmt = $this->conn->prepare($query);
+        $confirmed = "Confirmed";
+        $stmt->bind_param("is", $user_id, $confirmed);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
+
+    public function GetAllAppointments() {
+        $query = "SELECT a.*, u.id AS user_id, u.name AS name FROM appointments a JOIN users u ON a.user_id = u.id";
+        $result = $this->conn->query($query);
+        return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+    
     //Creating new appointments
     public function CreateAppointments($user_id, $service_type, $appointment_date, $appointment_time){ 
         $query = "INSERT INTO appointments (user_id, service_type, appointment_date, appointment_time) VALUES (?, ?, ?,?)";

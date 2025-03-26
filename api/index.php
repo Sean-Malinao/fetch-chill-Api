@@ -2,8 +2,6 @@
 
 //view
 header("Content-Type: application/json");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 
 //controllers
 require_once '../controller/appointmentcontroller.php';
@@ -32,7 +30,7 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
     switch ($requestMethod) {
         case 'GET': 
             if(preg_match('/\/appointment\/user\/(\d+)/', $uri, $matches)) {
-                $appointmentController->GetallAppointmentsByUserId($matches[1]);
+                $appointmentController->GetAllConfirmedAppointments($matches[1]);
             } elseif(preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
                 $appointmentController->GetAppointment($matches[1]);
             } elseif (preg_match('/\/appointment/', $uri)) {

@@ -17,15 +17,18 @@ class AppointmentController {
             echo json_encode(['message' => 'No appointment found']);
         }
     }
-    //get all appointments by user id
-    public function GetallAppointmentsByUserId($user_id){
-        $appointment = $this->appointment->GetAppointmentByUserId($user_id);
-        if($appointment){
-            echo json_encode($appointment);
-        } else{
+    
+    // Get all confirmed appointments by user
+    public function GetAllConfirmedAppointments($user_id){
+        $appointments = $this->appointment->GetAllConfirmedAppointments($user_id);
+
+        if (!empty($appointments)) {
+            echo json_encode($appointments);
+        } else {
             echo json_encode(['message' => 'No appointment found']);
         }
     }
+
     // Get all appointments
     public function GetAllAppointments(){
         $appointments = $this->appointment->GetAllAppointments();

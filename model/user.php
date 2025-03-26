@@ -53,7 +53,7 @@ class UserModel{
             return "Error: " . $this->conn->error;
         }
     }
-    //for updating password
+    //getting user by id
     public function getUserByid($id) {
         $query = "SELECT * FROM users WHERE id = ?";
         if ($stmt = $this->conn->prepare($query)) {
