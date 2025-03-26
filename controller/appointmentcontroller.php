@@ -28,7 +28,16 @@ class AppointmentController {
             echo json_encode(['message' => 'No appointment found']);
         }
     }
+    // Get all cancelled appointments by user
+    public function GetAllCancelledAppointments($user_id){
+        $appointments = $this->appointment->GetAllCancelledAppointments($user_id);
 
+        if (!empty($appointments)) {
+            echo json_encode($appointments);
+        } else {
+            echo json_encode(['message' => 'No appointment found']);
+        }
+    }
     // Get all appointments
     public function GetAllAppointments(){
         $appointments = $this->appointment->GetAllAppointments();
@@ -38,13 +47,20 @@ class AppointmentController {
         echo json_encode(['message' => 'No appointment found'. $appointments]);
         } 
     }
+
     //Create appointment
     public function CreateAppointment($input){
         $user_id = $input['user_id'];
+        $user = $this->appointment->ifuserexists($user_id);
+        if(!$user){
+            echo json_encode(['message' => 'User does not exist']);
+            return;
+        }
         $service_type = $input['service_type'];
         $appointment_date = $input['appointment_date'];
         $appointment_time = $input['appointment_time'];
         $this->appointment->CreateAppointments($user_id, $service_type, $appointment_date, $appointment_time);
+        
     }
     //Update appointment status
     public function UpdateAppointmentsStatus($id, $input){

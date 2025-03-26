@@ -8,6 +8,7 @@ class Appointment{
     {
         $this->conn = PetDatabase::getInstance();
     }
+
     // get appointment of specific owner
     public function GetAppointment($id) {
         $stmt = $this->conn->prepare("SELECT * FROM appointments WHERE id = ?");
@@ -23,6 +24,7 @@ class Appointment{
         $stmt->close();
         return $appointment;
     }
+
     //get all appointments of a user
     public function GetAppointmentByUserId($user_id) {
         $stmt = $this->conn->prepare("SELECT * FROM appointments WHERE user_id = ?");
@@ -38,6 +40,8 @@ class Appointment{
         $stmt->close();
         return $appointment;
     }
+
+    //get all appointments of a user
     public function GetAllConfirmedAppointments($user_id){
         $query = "SELECT * FROM appointments WHERE user_id = ? AND status = ?";
         $stmt = $this->conn->prepare($query);
@@ -49,12 +53,26 @@ class Appointment{
         return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
+    //get all appointments of a user
+    public function GetAllCancelledAppointments($user_id){
+        $query = "SELECT * FROM appointments WHERE user_id = ? AND status = ?";
+        $stmt = $this->conn->prepare($query);
+        $cancelled = "Cancelled";
+        $stmt->bind_param("is", $user_id, $cancelled);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    //for website
     public function GetAllAppointments() {
         $query = "SELECT a.*, u.id AS user_id, u.name AS name FROM appointments a JOIN users u ON a.user_id = u.id";
         $result = $this->conn->query($query);
         return $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
     
+
     //Creating new appointments
     public function CreateAppointments($user_id, $service_type, $appointment_date, $appointment_time){ 
         $query = "INSERT INTO appointments (user_id, service_type, appointment_date, appointment_time) VALUES (?, ?, ?,?)";
@@ -68,6 +86,22 @@ class Appointment{
             $stmt->close();
         }
     }
+    //check if user id exists
+    public function ifuserexists($user_id){
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE id = ?");
+        if ($stmt === false) {
+            throw new mysqli_sql_exception("Prepare statement failed: " . $this->conn->error);
+        }
+        $stmt->bind_param('i', $user_id);
+        if ($stmt->execute() === false) {
+            throw new mysqli_sql_exception("Execute statement failed: " . $stmt->error);
+        }
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $stmt->close();
+        return $user;
+    }
+
     //update appointment status
     public function UpdateStatus($status, $id) {
         $stmt = $this->conn->prepare("UPDATE appointments SET status = ? WHERE id = ?");

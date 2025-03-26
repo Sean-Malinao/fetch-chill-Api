@@ -31,12 +31,14 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
         case 'GET': 
             if(preg_match('/\/appointment\/user\/(\d+)/', $uri, $matches)) {
                 $appointmentController->GetAllConfirmedAppointments($matches[1]);
+            } elseif(preg_match('/\/appointment\/user\/cancelled\/(\d+)/', $uri, $matches)) {
+                $appointmentController->GetAllCancelledAppointments($matches[1]);
             } elseif(preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
                 $appointmentController->GetAppointment($matches[1]);
             } elseif (preg_match('/\/appointment/', $uri)) {
                 $appointmentController->GetAllAppointments();
             } else {
-                echo json_encode(['message' => 'No appointment found']);
+                echo json_encode(['message' => 'No approve appointments found']);
             }
             break;
         case 'POST': // Handle POST requests to create a new appointment
