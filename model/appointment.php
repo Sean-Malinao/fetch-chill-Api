@@ -94,7 +94,7 @@ class Appointment{
         }
         $stmt->bind_param('i', $user_id);
         if ($stmt->execute() === false) {
-            throw new mysqli_sql_exception("Execute statement failed: " . $stmt->error);
+            throw new mysqli_sql_exception("Execute statement failed: " . $stmt->error); // It helps in debugging by providing detailed error messages.Ensures that execution stops immediately when an error occurs.
         }
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
@@ -117,6 +117,19 @@ class Appointment{
     //delete appointment
     public function DeleteAppointment($id){
         $stmt = $this->conn->prepare("DELETE FROM appointments WHERE id = ?");
+        if ($stmt === false) {
+            throw new mysqli_sql_exception("Prepare statement failed: " . $this->conn->error);
+        }
+        $stmt->bind_param('i', $id);
+        if ($stmt->execute() === false) {
+            throw new mysqli_sql_exception("Execute statement failed: " . $stmt->error);
+        }
+        $stmt->close();
+    }
+
+    //delete appointment by user
+    public function DeletePendingAppointment($id){
+        $stmt = $this->conn->prepare("DELETE FROM appointments WHERE id = ? AND status = 'Pending'");
         if ($stmt === false) {
             throw new mysqli_sql_exception("Prepare statement failed: " . $this->conn->error);
         }

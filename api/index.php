@@ -9,16 +9,18 @@ require_once '../controller/petrecordscontroller.php';
 require_once '../controller/admincontroller.php';
 require_once '../controller/usercontroller.php';
 
+//get request method, uri and content type
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $uri = $_SERVER['REQUEST_URI'];
 $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
-
+//check if content type is json
 if (strpos($contentType, 'application/json') === false) {
     echo json_encode(['message' => 'Invalid json content type.']);
     exit;
 }
 
+// initialize controllers it will not access controllers if not called
 $input = json_decode(file_get_contents('php://input'), true);
 $appointmentController = new AppointmentController();
 $petrecordsController = new PetController();
@@ -55,18 +57,22 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                 echo json_encode(['message' => 'Invalid endpoint']);
             }
             break;
-        case 'DELETE': // Handle DELETE requests to delete an appointment
-            if (preg_match('/\/appointment\/(\d+)/', $uri, $matches)) {
-                $appointmentController->DeleteAppointment($matches[1]);
+        case 'DELETE': // Handle DELETE requests to delete an 
+            if(preg_match('/\/appointment\/cancelled\/(\d+)/', $uri, $matches)) {
+                $appointmentController->DeleteCancelledAppointment($matches[1]);
+            }  elseif(preg_match('/\/appointment\/user\/(\d+)/', $uri, $matches)) {
+                $appointmentController->DeletePendingAppointment($matches[1]);
+            }  elseif(preg_match('/\/appointment\/all/', $uri)) {
+                $appointmentController->DeleteAllAppointments();
+            }  elseif(preg_match('/\/appointment\/user/', $uri)) {
+                echo json_encode(['message' => 'Invalid endpoint']);
             } else {
                 echo json_encode(['message' => 'Invalid endpoint']);
             }
             break;
             default:
-            echo json_encode(['message' => 'Invalid request method']);
-            
+        }
     }
-}
     //handle petrecords
     function handlepetrecords($petrecordsController, $requestMethod, $uri, $input) {
         switch ($requestMethod) {
@@ -103,6 +109,7 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                 default:
             }
         }
+
     //for usermanagement
     function handlestaff($adminController, $requestMethod, $uri, $input) {
         switch ($requestMethod) {
@@ -146,7 +153,6 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
                     echo json_encode(['message' => 'Invalid input']);
                 }
             }
-                default:
         }
     }
     // for user acc signup and login
@@ -187,6 +193,8 @@ function handleappointments($appointmentController, $requestMethod, $uri, $input
         }
     }
 }
+// check if what function to call
+// check if the endpoint is valid
 // Determine which endpoint is being accessed and call the appropriate handler function
 if (preg_match('/\/appointment/', $uri)) {
     handleappointments($appointmentController, $requestMethod, $uri, $input);

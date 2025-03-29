@@ -84,5 +84,10 @@ class AppointmentController {
         echo json_encode(['message' => 'Appointment deleted']);
     }
 
+    public function DeletePendingAppointment($id){
+        $this->appointment->DeletePendingAppointment($id);
+        echo json_encode(['message' => 'Pending appointment deleted']);
+    }
+
 }
 ?>
